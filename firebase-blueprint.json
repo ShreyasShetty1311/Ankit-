@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "Url": {
+      "title": "URL",
+      "description": "A shortened URL mapping.",
+      "type": "object",
+      "properties": {
+        "originalUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "The original long URL."
+        },
+        "shortId": {
+          "type": "string",
+          "description": "The unique short identifier."
+        },
+        "clickCount": {
+          "type": "integer",
+          "description": "Number of times the link has been clicked."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the link was created."
+        },
+        "category": {
+          "type": "string",
+          "description": "Optional category for the link."
+        }
+      },
+      "required": ["originalUrl", "shortId", "clickCount", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/urls/{urlId}": {
+      "schema": "Url",
+      "description": "Collection of shortened URLs."
+    }
+  }
+}
