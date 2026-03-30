@@ -24,7 +24,7 @@ interface RecentLinksProps {
 }
 
 export default function RecentLinks({ onRefresh, showOnlyAnalytics = false, globalSearch = "" }: RecentLinksProps) {
-  const { user } = useAuth();
+  const { user, fetchUserId } = useAuth();
   const [links, setLinks] = useState<UrlData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +39,7 @@ export default function RecentLinks({ onRefresh, showOnlyAnalytics = false, glob
   const loadLinks = async () => {
     try {
       setError(null);
-      const data = await fetchUrls(user?.uid);
+      const data = await fetchUrls(fetchUserId);
       setLinks(data);
     } catch (err: any) {
       console.error("Error fetching links:", err);
@@ -53,7 +53,7 @@ export default function RecentLinks({ onRefresh, showOnlyAnalytics = false, glob
     loadLinks();
     const interval = setInterval(loadLinks, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchUserId]);
 
   const handleDelete = async (id: string) => {
     try {

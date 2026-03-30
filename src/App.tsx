@@ -7,7 +7,7 @@ import LoginPage from "./components/LoginPage";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { LayoutDashboard, BarChart3, Link2, Plus, TrendingUp } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 export type NavTab = "Dashboard" | "Analytics" | "Links" | "Campaigns";
@@ -19,6 +19,16 @@ function AppShell() {
   const [globalSearch, setGlobalSearch] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleRefresh = () => setRefreshTrigger(prev => prev + 1);
+
+  // Always land on Dashboard when a user signs in (Google or Demo)
+  const prevUserRef = useRef<typeof user>(null);
+  useEffect(() => {
+    if (user && !prevUserRef.current) {
+      setActiveTab("Dashboard");
+      setGlobalSearch("");
+    }
+    prevUserRef.current = user;
+  }, [user]);
 
   // Loading state while Firebase resolves auth
   if (loading) {

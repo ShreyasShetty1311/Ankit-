@@ -10,7 +10,7 @@ import { fetchCampaigns, fetchUrls, createCampaign, type Campaign, type UrlData 
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Campaigns() {
-  const { user } = useAuth();
+  const { user, fetchUserId } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [links, setLinks] = useState<UrlData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +24,8 @@ export default function Campaigns() {
     try {
       setError(null);
       const [campData, linkData] = await Promise.all([
-        fetchCampaigns(user?.uid),
-        fetchUrls(user?.uid),
+        fetchCampaigns(fetchUserId),
+        fetchUrls(fetchUserId),
       ]);
       setCampaigns(campData);
       setLinks(linkData);
@@ -38,14 +38,14 @@ export default function Campaigns() {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [fetchUserId]);
 
   const handleCreateCampaign = async (e: FormEvent) => {
     e.preventDefault();
     if (!newCampaign.name) return;
     setCreating(true);
     try {
-      await createCampaign({ ...newCampaign, userId: user?.uid ?? null });
+      await createCampaign({ ...newCampaign, userId: fetchUserId });
       toast.success("Campaign created successfully!");
       setShowCreateModal(false);
       setNewCampaign({ name: "", description: "" });

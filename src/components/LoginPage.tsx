@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Sparkles, Loader2, Link2, BarChart3, Shield, AlertCircle, ExternalLink } from "lucide-react";
+import { Sparkles, Loader2, Link2, BarChart3, Shield, AlertCircle, ExternalLink, FlaskConical } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginPage() {
-  const { signInWithGoogle, authError } = useAuth();
+  const { signInWithGoogle, enterDemo, authError } = useAuth();
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -18,6 +18,10 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDemoEnter = () => {
+    enterDemo();
   };
 
   const displayError = localError || authError;
@@ -59,7 +63,7 @@ export default function LoginPage() {
         >
           <h2 className="text-2xl font-bold text-on-surface mb-2">Get Started</h2>
           <p className="text-sm text-on-surface-variant mb-8">
-            Sign in with Google to create and manage your short links.
+            Explore with a demo or sign in with Google to manage your own short links.
           </p>
 
           {/* Features */}
@@ -74,7 +78,7 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {/* Error message — persistent and actionable */}
+          {/* Error message */}
           <AnimatePresence>
             {displayError && (
               <motion.div
@@ -114,7 +118,31 @@ export default function LoginPage() {
             )}
           </AnimatePresence>
 
-          {/* Google Sign-In Button */}
+          {/* ── Demo Enter Button ── */}
+          <motion.button
+            id="demo-enter-btn"
+            onClick={handleDemoEnter}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full flex items-center justify-center gap-3 bg-primary/10 text-primary border border-primary/30 py-4 rounded-2xl font-bold text-base hover:bg-primary/15 active:scale-[0.98] transition-all shadow-sm mb-3"
+          >
+            <FlaskConical size={20} />
+            Enter Demo
+          </motion.button>
+
+          {/* Demo subtext */}
+          <p className="text-[11px] text-on-surface-variant/50 text-center mb-6 leading-relaxed">
+            (Test mode for judges to evaluate using pre-configured links and campaigns)
+          </p>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px bg-outline-variant/20" />
+            <span className="text-[11px] font-bold text-on-surface-variant/40 uppercase tracking-wider">or</span>
+            <div className="flex-1 h-px bg-outline-variant/20" />
+          </div>
+
+          {/* ── Google Sign-In Button ── */}
           <button
             id="google-signin-btn"
             onClick={handleGoogleLogin}
@@ -149,35 +177,6 @@ export default function LoginPage() {
           <p className="text-[11px] text-on-surface-variant/50 text-center mt-5">
             By continuing, you agree to use this app responsibly. Your links are yours.
           </p>
-        </motion.div>
-
-        {/* Setup checklist hint */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mt-6 bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/10"
-        >
-          <p className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant/50 mb-3">Firebase Setup Checklist</p>
-          <div className="space-y-2">
-            {[
-              "Authentication → Sign-in method → Google → Enabled",
-              'Authentication → Settings → Authorized domains → "localhost" added',
-            ].map((step) => (
-              <div key={step} className="flex items-start gap-2">
-                <div className="w-4 h-4 rounded-full border-2 border-on-surface-variant/20 flex-shrink-0 mt-0.5" />
-                <p className="text-[11px] text-on-surface-variant/60">{step}</p>
-              </div>
-            ))}
-          </div>
-          <a
-            href="https://console.firebase.google.com/project/shortify-pro-aeca1/authentication/providers"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 mt-3 text-[11px] font-bold text-primary hover:underline"
-          >
-            Open Authentication Settings <ExternalLink size={10} />
-          </a>
         </motion.div>
 
         <p className="text-center text-xs text-on-surface-variant/40 mt-6">

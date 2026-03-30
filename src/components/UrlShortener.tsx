@@ -28,7 +28,7 @@ const categories = ["General", "Social", "Work", "Marketing", "Personal"] as con
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function UrlShortener({ onShortened }: UrlShortenerProps) {
-  const { user } = useAuth();
+  const { user, fetchUserId } = useAuth();
   const [url, setUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [category, setCategory] = useState("General");
@@ -44,10 +44,10 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
 
   // Load campaigns for the dropdown
   useEffect(() => {
-    fetchCampaigns(user?.uid)
+    fetchCampaigns(fetchUserId)
       .then(setCampaigns)
       .catch(() => {}); // silent fail — campaigns are optional
-  }, [user?.uid]);
+  }, [fetchUserId]);
 
   // ── Validation ──────────────────────────────────────────────────────────────
 
@@ -99,7 +99,7 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
         customShortId: customShortId.trim() || undefined,
         expiryDate: expiryDate || undefined,
         campaignId: campaignId || undefined,
-        userId: user?.uid ?? null,
+        userId: fetchUserId,
       };
 
       const data = await shortenUrl(payload);
