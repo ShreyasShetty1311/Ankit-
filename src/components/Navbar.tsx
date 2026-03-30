@@ -10,12 +10,12 @@ export default function Navbar() {
             Shortify Pro
           </div>
           
-          <div className="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full w-80 border border-outline-variant/10">
+          <div className="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-full w-80 border border-outline-variant/10 focus-within:ring-0">
             <Search size={16} className="text-on-surface-variant/40 mr-2" />
             <input 
               type="text" 
               placeholder="Quick search links..." 
-              className="bg-transparent border-none text-sm focus:ring-0 w-full"
+              className="bg-transparent border-none text-sm focus:ring-0 w-full caret-primary outline-none"
             />
             <span className="text-[10px] font-bold text-on-surface-variant/40 bg-surface-container-highest px-1.5 py-0.5 rounded border border-outline-variant/10">⌘K</span>
           </div>
@@ -35,16 +35,11 @@ export default function Navbar() {
           
           <div className="flex items-center gap-3 pl-4 border-l border-outline-variant/10">
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-bold text-on-surface">Shreyas Shetty</div>
+              <div className="text-sm font-bold text-on-surface">Ankit Ranjan</div>
               <div className="text-[10px] font-bold text-primary uppercase tracking-wider">Pro Member</div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center overflow-hidden border border-outline-variant/20 shadow-sm">
-              <img
-                alt="User profile avatar"
-                className="w-full h-full object-cover"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                referrerPolicy="no-referrer"
-              />
+            <div className="w-10 h-10 rounded-xl bg-surface-container-highest flex items-center justify-center overflow-hidden border border-outline-variant/20 shadow-sm text-2xl">
+              👹
             </div>
           </div>
         </div>

@@ -71,7 +71,10 @@ export default function RecentLinks({ onRefresh, showOnlyAnalytics = false }: Re
       if (response.ok) {
         toast.success("Link deleted");
         setDeletingId(null);
-        fetchLinks();
+        // Update local state immediately for better UX
+        setLinks(prev => prev.filter(l => l.id !== id));
+        // Trigger global refresh
+        onRefresh();
       }
     } catch (error) {
       toast.error("Failed to delete link");
@@ -237,13 +240,14 @@ export default function RecentLinks({ onRefresh, showOnlyAnalytics = false }: Re
               className="bg-surface-container-lowest rounded-3xl border border-outline-variant/10 overflow-hidden hover:border-primary/30 transition-all group"
             >
               <div className="p-6">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Left: Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider rounded-full">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start lg:items-center">
+                  {/* Left: Info (6 columns) */}
+                  <div className="lg:col-span-6 min-w-0 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider rounded-full">
+                        <Tag size={12} />
                         {link.category}
-                      </span>
+                      </div>
                       {link.expiryDate && (
                         <span className={`flex items-center gap-1 text-[10px] font-bold uppercase ${new Date(link.expiryDate) < new Date() ? 'text-red-500' : 'text-orange-500'}`}>
                           <Clock size={12} />
@@ -257,45 +261,53 @@ export default function RecentLinks({ onRefresh, showOnlyAnalytics = false }: Re
                         </span>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold text-on-surface truncate mb-1">
-                      {link.originalUrl}
-                    </h3>
-                    <div className="flex items-center gap-4 text-sm text-on-surface-variant/60">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar size={14} />
-                        {format(new Date(link.createdAt), "MMM dd, yyyy")}
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <BarChart3 size={14} />
-                        {link.clickCount} clicks
+                    
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-bold text-on-surface break-all line-clamp-1 group-hover:line-clamp-none transition-all cursor-default">
+                        {link.originalUrl}
+                      </h3>
+                      <div className="flex items-center gap-4 text-xs text-on-surface-variant/60">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar size={14} />
+                          {format(new Date(link.createdAt), "MMM dd, yyyy")}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <BarChart3 size={14} />
+                          {link.clickCount} clicks
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Middle: Short Link */}
-                  <div className="flex flex-col justify-center gap-2">
+                  {/* Middle: Short Link (4 columns) */}
+                  <div className="lg:col-span-4 flex flex-col gap-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/40 ml-1">Short Link</label>
                     <div className="flex items-center gap-2 bg-surface-container-high p-1.5 rounded-2xl border border-outline-variant/5">
-                      <div className="px-4 py-2 font-mono font-bold text-primary text-sm">
-                        {window.location.origin}/{link.shortId}
+                      <div className="px-4 py-2 font-mono font-bold text-primary text-sm truncate flex-1">
+                        ank.it/{link.shortId}
                       </div>
-                      <button 
-                        onClick={() => copyToClipboard(link.shortId, link.id)}
-                        className="p-2 hover:bg-white rounded-xl transition-colors text-on-surface-variant"
-                      >
-                        {copiedId === link.id ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
-                      </button>
-                      <a 
-                        href={`/${link.shortId}`} 
-                        target="_blank" 
-                        className="p-2 hover:bg-white rounded-xl transition-colors text-on-surface-variant"
-                      >
-                        <ExternalLink size={18} />
-                      </a>
+                      <div className="flex items-center gap-1 pr-1">
+                        <button 
+                          onClick={() => copyToClipboard(link.shortId, link.id)}
+                          className="p-2 hover:bg-white rounded-xl transition-colors text-on-surface-variant"
+                          title="Copy Link"
+                        >
+                          {copiedId === link.id ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
+                        </button>
+                        <a 
+                          href={`/${link.shortId}`} 
+                          target="_blank" 
+                          className="p-2 hover:bg-white rounded-xl transition-colors text-on-surface-variant"
+                          title="Open Link"
+                        >
+                          <ExternalLink size={18} />
+                        </a>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Right: Actions */}
-                  <div className="flex items-center gap-2">
+                  {/* Right: Actions (2 columns) */}
+                  <div className="lg:col-span-2 flex items-center justify-end gap-2">
                     <AnimatePresence mode="wait">
                       {deletingId === link.id ? (
                         <motion.div 

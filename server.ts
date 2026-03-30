@@ -46,9 +46,17 @@ async function startServer() {
   app.use(morgan("dev"));
   app.use(express.json());
 
+  // Test Firestore connection
+  try {
+    const testSnapshot = await getDocs(query(collection(db, "urls"), where("shortId", "==", "test-connection")));
+    console.log("Firestore connection successful.");
+  } catch (error) {
+    console.error("Firestore connection failed. Please check your configuration.", error);
+  }
+
   // API: Shorten URL
   app.post("/api/shorten", async (req, res) => {
-    const { originalUrl, category, customShortId, expiryDate, aiInsights } = req.body;
+    const { originalUrl, category, customShortId, expiryDate, aiInsights, campaignId } = req.body;
 
     if (!originalUrl || !originalUrl.startsWith("http")) {
       return res.status(400).json({ error: "Invalid URL" });
@@ -73,6 +81,7 @@ async function startServer() {
         createdAt: serverTimestamp(),
         category: category || "General",
         expiryDate: expiryDate || null,
+        campaignId: campaignId || null,
         aiInsights: aiInsights || null, // { summary: string, safetyScore: number }
       };
 
@@ -129,6 +138,39 @@ async function startServer() {
     } catch (error) {
       console.error("Error deleting URL:", error);
       res.status(500).json({ error: "Failed to delete URL" });
+    }
+  });
+
+  // API: Campaigns
+  app.get("/api/campaigns", async (req, res) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "campaigns"));
+      const campaigns = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+      }));
+      res.json(campaigns);
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+      res.status(500).json({ error: "Failed to fetch campaigns" });
+    }
+  });
+
+  app.post("/api/campaigns", async (req, res) => {
+    const { name, description, status } = req.body;
+    try {
+      const campaignDoc = {
+        name,
+        description: description || "",
+        status: status || "active",
+        createdAt: serverTimestamp(),
+      };
+      const docRef = await addDoc(collection(db, "campaigns"), campaignDoc);
+      res.json({ id: docRef.id, ...campaignDoc });
+    } catch (error) {
+      console.error("Error creating campaign:", error);
+      res.status(500).json({ error: "Failed to create campaign" });
     }
   });
 

@@ -42,21 +42,6 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           </motion.button>
         ))}
       </nav>
-
-      <div className="mt-auto p-4 bg-primary rounded-xl text-white shadow-lg shadow-primary/20">
-        <div className="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">
-          Pro Plan
-        </div>
-        <div className="text-sm font-medium mb-3 leading-tight">
-          Unlock advanced analytics and custom domains.
-        </div>
-        <button 
-          onClick={() => toast.success("Redirecting to checkout...")}
-          className="w-full py-2 bg-white text-primary rounded-full text-xs font-bold uppercase tracking-wider hover:bg-opacity-90 transition-all active:scale-95"
-        >
-          Upgrade to Pro
-        </button>
-      </div>
     </aside>
   );
 }

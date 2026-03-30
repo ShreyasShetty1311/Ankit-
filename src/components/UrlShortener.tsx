@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link2, Sparkles, ShieldCheck, Calendar, Zap, ChevronDown, Globe } from "lucide-react";
+import { Link2, Sparkles, ShieldCheck, Calendar, Zap, ChevronDown, Globe, Copy, Check, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { scanUrlSafety } from "../services/geminiService";
@@ -13,6 +13,8 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
   const [category, setCategory] = useState("General");
   const [customShortId, setCustomShortId] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [campaignId, setCampaignId] = useState("");
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [aiInsights, setAiInsights] = useState<any>(null);
@@ -22,8 +24,16 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
 
   const categories = ["General", "Social", "Work", "Marketing", "Personal"];
 
+  React.useEffect(() => {
+    fetch("/api/campaigns")
+      .then(res => res.json())
+      .then(data => setCampaigns(data))
+      .catch(err => console.error("Error fetching campaigns:", err));
+  }, []);
+
   const handleCopy = () => {
     if (shortenedResult) {
+      // Copy the REAL URL to clipboard so it actually works
       navigator.clipboard.writeText(shortenedResult);
       setCopied(true);
       toast.success("Copied to clipboard!");
@@ -68,6 +78,7 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
           category,
           customShortId: customShortId || undefined,
           expiryDate: expiryDate || undefined,
+          campaignId: campaignId || undefined,
           aiInsights
         }),
       });
@@ -80,6 +91,7 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
         setUrl("");
         setCustomShortId("");
         setExpiryDate("");
+        setCampaignId("");
         setAiInsights(null);
         onShortened();
       } else {
@@ -90,6 +102,11 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDisplayUrl = (url: string) => {
+    const shortId = url.split('/').pop();
+    return `ank.it/${shortId}`;
   };
 
   return (
@@ -214,6 +231,27 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
 
                   <div className="flex-1 min-w-[200px]">
                     <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant/60 mb-2 ml-1">
+                      Campaign (Optional)
+                    </label>
+                    <div className="relative">
+                      <select
+                        className="w-full bg-surface-container-high border-none rounded-2xl py-3 px-4 text-on-surface appearance-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        value={campaignId}
+                        onChange={(e) => setCampaignId(e.target.value)}
+                      >
+                        <option value="">No Campaign</option>
+                        {campaigns.map((camp) => (
+                          <option key={camp.id} value={camp.id}>
+                            {camp.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 pointer-events-none" size={16} />
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-[200px]">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant/60 mb-2 ml-1">
                       Expiry Date (Optional)
                     </label>
                     <div className="relative">
@@ -266,7 +304,7 @@ export default function UrlShortener({ onShortened }: UrlShortenerProps) {
                     Your shortened conduit
                   </p>
                   <p className="text-xl font-mono font-bold text-on-surface">
-                    {shortenedResult}
+                    {getDisplayUrl(shortenedResult)}
                   </p>
                 </div>
               </div>

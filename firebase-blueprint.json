@@ -26,15 +26,49 @@
         "category": {
           "type": "string",
           "description": "Optional category for the link."
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "Optional reference to a campaign."
         }
       },
       "required": ["originalUrl", "shortId", "clickCount", "createdAt"]
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "description": "A marketing campaign grouping multiple links.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the campaign."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the campaign."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the campaign was created."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "paused", "completed"],
+          "description": "Current status of the campaign."
+        }
+      },
+      "required": ["name", "status", "createdAt"]
     }
   },
   "firestore": {
     "/urls/{urlId}": {
       "schema": "Url",
       "description": "Collection of shortened URLs."
+    },
+    "/campaigns/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Collection of marketing campaigns."
     }
   }
 }
